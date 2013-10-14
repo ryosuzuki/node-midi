@@ -1,14 +1,21 @@
+var express = require('express');
+var routes = require('./routes');
+var io = require('socket.io');
 
-/**
- * Module dependencies.
- */
+var app = module.exports = express.createServer();
+var io = io.listen(app);
 
-var express = require('express')
-  , routes = require('./routes')
-  , io = require('socket.io');
+var serialport = require('serialport');
+var portName = '/dev/tty.usbmodem1421';
+var sp = new serialport.SerialPort(portName, {
+    baudRate: 31250,
+    dataBits: 8,
+    parity: 'none',
+    stopBits: 1,
+    flowControl: false,
+    parser: serialport.parsers.readline("\n") 
+});
 
-var app = module.exports = express.createServer(),
-    io = io.listen(app);
 
 // Configuration
 
@@ -53,9 +60,27 @@ try {
 }
 
 var stream = midi.createReadStream(midiIn);
-  
-io.sockets.on('connection', function (socket) {
 
+  
+var buffer = new Array();
+
+io.sockets.on('connection', function (socket) {
+  sp.on('data', function(input){
+    var arduino_data = input;
+    
+    input = parseInt(input);
+    buffer.push(input);
+    if (buffer.length == 6) {
+      var message = new Array(buffer[0], buffer[2], buffer[4]);
+      console.log(message);
+      io.sockets.emit('msg', {message : message});
+      
+      buffer.splice(0, 5);
+    }
+    
+    //  socket.emit('one', {led : arduino_data});    
+  });
+  
   midiIn.on('message', function(deltaTime, message) {
     console.log('m:' + message + ' d:' + deltaTime);
 
