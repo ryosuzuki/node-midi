@@ -1,3 +1,40 @@
+$(function() {
+  var socket = io.connect('/');
+  socket.on('msg', function (data) {
+    var message = data['message'];
+    console.log(message);
+
+    var channel = message[0];
+    var note = message[1];
+    var velocity = message[2];
+    
+    var $key;
+    if (note == 60) {
+      $key = $('.C');
+    } else if (note == 62) {
+      $key = $('.D');
+    } else if (note == 64) {
+      $key = $('.E');
+    } else if (note == 65) {
+      $key = $('.F');
+    } else if (note == 67) {
+      $key = $('.G');
+    } else if (note == 69) {
+      $key = $('.A');
+    } else if (note == 71) {
+      $key = $('.H');
+    }
+
+    if (velocity == 0) {
+      $key.removeClass('note-on');
+    } else {
+      $key.addClass('note-on');	
+    }
+
+  });
+});
+
+
 (function($){
     // connect to socket.io
     var socket = io.connect('http://localhost'); // change to appropiate for network access
