@@ -58,14 +58,15 @@ io.sockets.on('connection', function (socket) {
 
   midiIn.on('message', function(deltaTime, message) {
     console.log('m:' + message + ' d:' + deltaTime);
-    
+
     io.sockets.emit('msg', {message : message});
   });
+
 /*
   // note
   socket.on('notedown',function(data){
-    midiOut.sendMessage([144,data.message,100]);
-    console.log('Notedown : ' + data.message);
+    midiOdata.message,100]);
+    console.log('Notedown: ' + data.message);
     socket.broadcast.emit('playeddown',{'message':data.message});
   });
 

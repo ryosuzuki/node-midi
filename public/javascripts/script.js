@@ -1,3 +1,12 @@
+window.onload = function () {
+  MIDI.loadPlugin({
+    soundfontUrl: "/javascripts/soundfont/",
+    instrument: "acoustic_grand_piano",
+    callback: function() {
+    }
+  });
+};
+
 $(function() {
   var socket = io.connect('/');
   socket.on('msg', function (data) {
@@ -7,7 +16,12 @@ $(function() {
     var channel = message[0];
     var note = message[1];
     var velocity = message[2];
-    
+    var delay = 0;
+	
+    MIDI.setVolume(0, 127);
+    MIDI.noteOn(0, note, velocity, delay);
+    MIDI.noteOff(0, note, delay + 0.75);
+
     var $key;
     if (note == 60) {
       $key = $('.C');
@@ -30,7 +44,6 @@ $(function() {
     } else {
       $key.addClass('note-on');	
     }
-
   });
 });
 
